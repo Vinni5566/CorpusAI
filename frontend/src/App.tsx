@@ -54,6 +54,10 @@ export default function App() {
 
   const terminalEndRef = useRef<HTMLDivElement>(null);
 
+  // Environment-driven API URLs (defaults to localhost for dev)
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:4000';
+
   // Auto-scroll terminal to bottom when new logs arrive
   useEffect(() => {
     if (terminalEndRef.current) {
@@ -64,7 +68,7 @@ export default function App() {
   // Fetch Parent Page ID configuration
   const fetchConfig = async () => {
     try {
-      const res = await fetch('http://localhost:3000/api/config');
+      const res = await fetch(`${API_URL}/api/config`);
       if (res.ok) {
         const data = await res.json();
         setParentPageId(data.parentPageId || '');
@@ -77,7 +81,7 @@ export default function App() {
   // Fetch agent logs for a specific initiative
   const fetchLogs = async (initiativeId: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/initiatives/${initiativeId}/logs`);
+      const res = await fetch(`${API_URL}/api/initiatives/${initiativeId}/logs`);
       if (res.ok) {
         const data = await res.json();
         setLogs(data.logs || []);
@@ -90,8 +94,8 @@ export default function App() {
   // Fetch all initiatives and decisions
   const fetchData = async () => {
     try {
-      const initRes = await fetch('http://localhost:3000/api/initiatives');
-      const decRes = await fetch('http://localhost:3000/api/decisions');
+      const initRes = await fetch(`${API_URL}/api/initiatives`);
+      const decRes = await fetch(`${API_URL}/api/decisions`);
       
       if (!initRes.ok || !decRes.ok) {
         throw new Error('Server returned an error');
@@ -122,7 +126,7 @@ export default function App() {
   // Fetch graph data for a given initiative
   const fetchGraphData = async (initiativeId: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/initiatives/${initiativeId}/graph`);
+      const res = await fetch(`${API_URL}/api/initiatives/${initiativeId}/graph`);
       if (!res.ok) throw new Error('Failed to fetch graph');
       const data = await res.json();
       setGraphData(data.graph);
@@ -133,7 +137,7 @@ export default function App() {
 
   // WebSocket for live FSM updates
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:4000');
+    const ws = new WebSocket(WS_URL);
     ws.onopen = () => console.log('[WS] Connected to backend');
     ws.onmessage = (event) => {
       try {
@@ -170,7 +174,7 @@ export default function App() {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:3000/api/initiatives/trigger', {
+      const response = await fetch(`${API_URL}/api/initiatives/trigger`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ goal, owner })
