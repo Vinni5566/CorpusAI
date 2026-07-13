@@ -1,8 +1,10 @@
-# AI-Native Enterprise Operating System
+# CorpusAI
 
-This project implements a multi-agent system where three departments (Marketing, Finance, Engineering) coordinate under a central state-machine Orchestrator. 
+CorpusAI is a multi-agent autonomous enterprise operating system that enables departments (Marketing, Finance, Engineering) to coordinate, negotiate, and execute complex corporate workflows under a centralized, FSM-guarded state machine. Powered by AI reasoning and backed by a Notion ledger control plane, it turns static documentation databases into active execution engines.
 
-## System Architecture
+---
+
+## 🏗️ System Architecture
 
 ```mermaid
 graph TD
@@ -36,81 +38,103 @@ graph TD
 
 ---
 
-## Created Notion Database & Workspace Summary
+## ⚡ Unique Selling Propositions (USPs)
 
-The automated setup script created the following structures under your parent page:
-
-1. **Initiatives Database**: The ledger of company goals, owner, status (`Planning`, `Awaiting Approval`, `Executing`, `Done`), and rolled-up summaries.
-2. **Agent Log Database**: The audit trail of agent requests, reasoning, counters, and errors.
-3. **Decisions Database**: The human gate for approvals. Updates here resume the state machine.
-4. **Actions Database**: Real links to created GitHub issues and Slack announcements.
-5. **Company Budget Policy**: Standalone guidelines doc that the Finance agent reads to evaluate threshold limits.
+*   **Notion as the Enterprise Control Plane:** No new software training needed. Managers trigger objectives, inspect progress, and authorize budgets directly inside their existing Notion databases.
+*   **FSM-Guarded Workflows:** Multi-agent collaboration is boxed inside a strict Finite State Machine. This prevents infinite hallucination loops, runaway spending, and rogue agent behavior.
+*   **Adaptive Autonomy & Risk-Engine:** Automatically computes decision risk. Low-risk actions (e.g. within budget and matching historical approvals) are auto-approved, while high-risk actions trigger human authorization gates.
+*   **Audit-Log Ledger Persistence:** Every LLM prompt, thought process, disagreement, and tool activation is permanently recorded in a structured database ledger.
 
 ---
 
-## Running the Application
+## ✨ Key Visual Features
+
+*   **D3.js Lineage Graph with Animated Flow Particles:** A dynamic, force-directed node diagram tracking active agent pathways. Features glowing neon particles running along links to show real-time data transfer.
+*   **Live Agent Negotiation Chat:** A high-fidelity message console displaying the actual dialogue between Marketing and Finance agents as they negotiate budget proposals. Includes an "Agent Thoughts" drop-down to expose agent reasoning logs.
+*   **WebSocket Activity Terminal:** A low-latency scrolling developer terminal printing state-machine ticks, environment events, and middleware resolutions as they occur.
+*   **Autonomy Rate Gauge:** A custom visual metric card showing the percentage of total decisions approved automatically by the Adaptive Autonomy Engine without human intervention.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React 19, Vite, TypeScript, D3.js (Visual Lineage), Recharts (Agent Analytics), Lucide Icons |
+| **Backend** | Node.js, Express, WebSockets (`ws`), TypeScript |
+| **State Machine** | Custom state machine class with Notion interceptor middleware |
+| **Integrations** | Notion API, GitHub API (Octokit), Slack Web API |
+| **AI Layer** | NVIDIA NIM API (OpenAI-compatible), GPT-4o / LLama3 |
+
+---
+
+## 📓 Created Notion Database & Workspace Summary
+
+The automated setup script initializes the following structures under your parent page:
+
+1.  **Initiatives Database**: The main company goals registry containing names, owner, status (`Planning`, `Awaiting Approval`, `Executing`, `Done`), and rolled-up summaries.
+2.  **Agent Log Database**: The audit ledger of agent proposals, reasoning, counters, and errors.
+3.  **Decisions Database**: The human approval gateway. Status transitions here trigger/resume the orchestrator state machine.
+4.  **Actions Database**: Log of external outcomes (URLs of created GitHub issues and Slack announcements).
+5.  **Company Budget Policy**: Standalone text page outlining corporate guidelines, read by the Finance agent to judge proposals.
+
+---
+
+## 🏃 Running the Application
 
 ### 1. Start the Orchestrator Backend
 From the `orchestrator` folder:
 ```bash
 npm run dev
 ```
-This runs the sanity checks and starts the Express server on `http://localhost:3000`. It also fires the background Notion database polling loop (runs every 15s) as a fallback mechanism for approval checks.
+This runs env sanity checks and starts the Express + WebSocket server on `http://localhost:3000`. It also launches the background Notion database polling loop (polls every 15s) as a fallback mechanism.
 
 ### 2. Start the Frontend Dashboard
 From the `frontend` folder:
 ```bash
 npm run dev
 ```
-This launches the React development server. Open the displayed URL (usually `http://localhost:5173`) in your browser.
+This launches the Vite development server. Open the displayed URL (`http://localhost:5173`) in your browser to view the dashboard.
 
 ---
 
-## Remaining Manual Actions
+## 🔧 Production Deployment Config
 
-1. **Verify your Slack & GitHub values** in `orchestrator/.env`:
-   - Set `GITHUB_TOKEN` to a valid Personal Access Token (PAT).
-   - Set `GITHUB_REPO` to your active repository (e.g. `Madihawahab/AI_Enterprise_OS`).
-   - Set `SLACK_BOT_TOKEN` and `SLACK_CHANNEL_ID` to post real Slack messages.
-   *(Dummy stubs will automatically trigger if these remain placeholders).*
-2. **Webhook Tunneling (Optional)**:
-   - Run `ngrok http 3000` to get a public HTTPS URL.
-   - Set `PUBLIC_BASE_URL` in `.env` to your ngrok URL.
-   - Configure a webhook subscription in Notion to target `/webhooks/notion` (otherwise, the system will use the default automated polling fallback every 15s, which works immediately out of the box).
-3. **Known Limitation**: The FSM lock map `processingInitiatives` is **in-memory only**. Do not restart the backend server while an initiative is mid-negotiation or awaiting human approval.
+*   **Backend (Render):** Deploy as a Web Service. Set root directory to `orchestrator`, build command to `npm install && npm run build`, and start command to `node dist/server.js`.
+*   **Frontend (Vercel):** Deploy as a Vite site. Set root directory to `frontend`. Bind environment variables `VITE_API_URL` (HTTPS Render address) and `VITE_WS_URL` (WSS Render address) for secure WebSocket connections.
 
 ---
 
-## Live Demo Verification Flow (Checklist)
+## 📋 Live Demo Verification Flow (Checklist)
 
-Use this numbered checklist to verify the system or perform a live demo to show how the system resolves disagreements, gates decisions, executes actions, and learns:
+Use this checklist to run a live demonstration showing negotiation, human gates, execution, and adaptive learning:
 
-### Part 1: Negotiation & Human-in-the-Loop Approval (Novel Goal)
+### Part 1: Negotiation & Human-in-the-Loop Approval
 
-- [ ] **1. Open Dashboard**: Access the React dashboard (`http://localhost:5173`) and click **"Open Notion Workspace"** to load the parent page.
-- [ ] **2. Submit a Novel Goal**: In the dashboard form, enter the goal:
+- [ ] **1. Open Dashboard:** Access the React dashboard (`http://localhost:5173`) and click **"Open Notion Workspace"** to load the Notion parent page side-by-side.
+- [ ] **2. Submit a Goal:** In the dashboard form, enter the goal:
   *`"Launch a marketing campaign for our new feature, budget capped by company policy."`*
   Set owner to your name and click **"Kick Off Goal"**.
-- [ ] **3. Watch Agent Log Negotiation**: Refresh your Notion **Agent Log** page or watch the terminal:
-  - **Marketing** drafts a campaign and asks for a budget (typically $7,500).
-  - **Finance** reviews the Company Budget Policy page, detects it exceeds $5,000, and counters with $5,000.
-  - **Marketing** evaluates the pushback and submits a revised request of $6,250.
-  - **Finance** runs a final check and auto-escalates to human approval since they remained in disagreement after the 1-round negotiation limit.
-- [ ] **4. Verify Paused State**: Confirm the **Initiatives** status flips to `Awaiting Approval` and the state machine pauses.
-- [ ] **5. Approve in Notion**: Go to your Notion **Decisions** database, find the pending decision card, and change its `Status` select field to `Approved`.
-- [ ] **6. Confirm Automated Actions**: Within 15 seconds (via polling) or instantly (via webhook):
+- [ ] **3. Watch Agent Log Negotiation:** Watch the **Agent Negotiation Chat** and **Live Activity Terminal** on the dashboard:
+  - **Marketing** drafts a campaign and requests a budget (e.g. $7,500).
+  - **Finance** reviews the budget policy, finds it exceeds the $5,000 limit, and counters with $5,000.
+  - **Marketing** evaluates the counter, adjusts its plan, and requests a revised $6,250.
+  - **Finance** runs a final check and auto-escalates to human approval since they remained in conflict after the 1-round negotiation limit.
+- [ ] **4. Verify Paused State:** Confirm the **Initiatives** status flips to `Awaiting Approval` and the state machine pauses.
+- [ ] **5. Approve in Notion:** Go to your Notion **Decisions** database, find the pending decision card, and change its `Status` select field to `Approved`.
+- [ ] **6. Confirm Automated Actions:** Within 15 seconds (via polling fallback) or instantly (via webhook):
   - **Engineering** plans deliverables.
-  - A real **GitHub Issue** is created with the technical spec.
+  - A real **GitHub Issue** is created with the technical specifications.
   - A real **Slack message** is posted announcing the campaign.
   - Both URLs are written into the Notion **Actions** database.
   - The Initiative status on the ledger changes to `Done`.
 
 ### Part 2: Adaptive Autonomy (Low-Risk Recognition)
 
-- [ ] **7. Re-run a Similar Goal**: In the React dashboard, submit a similar goal (e.g. *"Launch a marketing campaign for feature Y"*).
-- [ ] **8. Verify Autonomy Auto-Approval**: Watch the Agent Log:
+- [ ] **7. Re-run a Similar Goal:** In the React dashboard, submit a similar goal (e.g. *"Launch a marketing campaign for feature Y"*).
+- [ ] **8. Verify Autonomy Auto-Approval:** Watch the Live Chat:
   - The Agents negotiate and land on a budget.
   - The **Adaptive Autonomy Engine** evaluates the request, recognizes it matches the previously approved campaign budget within 15%, and categorizes the risk as **Low**.
   - The Orchestrator writes a log entry: `[Adaptive Autonomy: AUTO-APPROVED $X. Matches approved decision...]`.
   - The state machine **skips the human approval gate** entirely, transitions straight to `Executing`, and fires the GitHub/Slack actions immediately.
-- [ ] **9. Check the Autonomy Rate**: Go to the frontend dashboard and verify the "Autonomous" percentage gauge has increased.
+- [ ] **9. Check the Autonomy Rate:** Verify the "Autonomous" percentage gauge on the dashboard has increased.
