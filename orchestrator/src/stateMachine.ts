@@ -17,9 +17,44 @@ export class OrchestratorFSM {
   private finance: FinanceAgent;
   private engineering: EngineeringAgent;
   private autonomy: AdaptiveAutonomyEngine;
+  private onEvent?: (event: any) => void;
 
-  constructor() {
+  constructor(onEvent?: (event: any) => void) {
+    this.onEvent = onEvent;
     this.notion = new NotionClientWrapper();
+
+    // Intercept createAgentLog to broadcast websocket event
+    const originalCreateAgentLog = this.notion.createAgentLog.bind(this.notion);
+    this.notion.createAgentLog = async (agentKey: any, log: any) => {
+      await originalCreateAgentLog(agentKey, log);
+      if (this.onEvent) {
+        this.onEvent({
+          type: 'fsm-update',
+          initiativeId: log.initiativeId,
+          eventType: 'log',
+          log: {
+            ...log,
+            timestamp: new Date().toISOString()
+          }
+        });
+      }
+    };
+
+    // Intercept updateInitiativeStatus to broadcast websocket event
+    const originalUpdateStatus = this.notion.updateInitiativeStatus.bind(this.notion);
+    this.notion.updateInitiativeStatus = async (id: string, status: any, summaryUpdate?: string) => {
+      await originalUpdateStatus(id, status, summaryUpdate);
+      if (this.onEvent) {
+        this.onEvent({
+          type: 'fsm-update',
+          initiativeId: id,
+          eventType: 'status_update',
+          status,
+          summary: summaryUpdate
+        });
+      }
+    };
+
     this.marketing = new MarketingAgent();
     this.finance = new FinanceAgent();
     this.engineering = new EngineeringAgent();

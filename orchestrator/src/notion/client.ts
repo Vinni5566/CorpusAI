@@ -273,4 +273,21 @@ export class NotionClientWrapper {
     });
     return response.results.map(mapNotionPageToDecision);
   }
+
+  async getAgentLogsForInitiative(initiativeId: string): Promise<AgentLogEntry[]> {
+    const agent = 'orchestrator';
+    const dbId = process.env.NOTION_AGENTLOG_DB_ID!;
+    this.checkPermission(agent, dbId, 'getAgentLogsForInitiative');
+
+    const response = await this.clients[agent].databases.query({
+      database_id: dbId,
+      filter: {
+        property: 'Initiative',
+        relation: {
+          contains: initiativeId
+        }
+      }
+    });
+    return response.results.map(mapNotionPageToAgentLog);
+  }
 }
