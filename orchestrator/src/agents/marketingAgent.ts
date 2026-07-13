@@ -1,5 +1,7 @@
 import { OpenAI } from 'openai';
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export interface CampaignProposal {
   campaignPlan: string;
   budgetRequest: {
@@ -73,6 +75,7 @@ You MUST respond with a valid JSON object matching this schema:
         if (attempt === retries) {
           throw new Error(`MarketingAgent.draftCampaign failed after ${retries} attempts: ${error.message}`);
         }
+        await delay(1000 * attempt);
       }
     }
     throw new Error('Unreachable state');
@@ -134,6 +137,7 @@ You MUST respond with a valid JSON object matching this schema:
         if (attempt === retries) {
           throw new Error(`MarketingAgent.negotiateBudget failed after ${retries} attempts: ${error.message}`);
         }
+        await delay(1000 * attempt);
       }
     }
     throw new Error('Unreachable state');

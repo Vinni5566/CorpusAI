@@ -1,5 +1,7 @@
 import { OpenAI } from 'openai';
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export interface FinanceResponse {
   decision: 'approve' | 'reject' | 'counter';
   counterAmount?: number;
@@ -78,6 +80,7 @@ You MUST respond with a valid JSON object matching this schema:
         if (attempt === retries) {
           throw new Error(`FinanceAgent.evaluateBudget failed after ${retries} attempts: ${error.message}`);
         }
+        await delay(1000 * attempt);
       }
     }
     throw new Error('Unreachable state');
