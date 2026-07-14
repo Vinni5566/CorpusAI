@@ -13,6 +13,8 @@ interface AnalyticsData {
   agentMetrics: Record<string, AgentMetrics>;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const AnalyticsPanel: React.FC = () => {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +22,7 @@ const AnalyticsPanel: React.FC = () => {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/analytics');
+        const res = await fetch(`${API_URL}/api/analytics`);
         if (!res.ok) throw new Error('Failed to fetch analytics');
         const json = await res.json();
         setData(json);
